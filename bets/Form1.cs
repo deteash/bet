@@ -13,8 +13,8 @@ namespace bets
 {
     public partial class Form1 : Form
     {
-        List<line> lines;
-        List<result> results;
+        private List<line> lines;
+        private List<result> results;
         public Form1()
         {
             InitializeComponent();
@@ -92,6 +92,7 @@ namespace bets
                                                     System.Globalization.DateTimeStyles.None, out ln.data);
                                 DateTime.TryParseExact(x, pattern3, System.Globalization.CultureInfo.InvariantCulture,
                                                     System.Globalization.DateTimeStyles.None, out ln.data);
+                                ln.rake = (1 / ln.win1 + 1 / ln.win2 + 1 / ln.x) - 1;
                                 write = true;
                             }
                         }
@@ -114,368 +115,386 @@ namespace bets
         private void button2_Click(object sender, EventArgs e)
         {
             int nbets = Convert.ToInt32(numericBets.Value);
-            if (results == null || nbets > results.Count())
-            {
-                MessageBox.Show("Не найдено столько событий!");
-                return;
-            }
-            int hours = (int)numericHours.Value;
-            List<result> mres = new List<result>();
-            List<int> mass = new List<int>();
-            dataGridView1.RowCount = nbets;
+            int betTimes = Convert.ToInt32(numericBetTimes.Value);
+            List<double> roiList = new List<double>();
+            List<double> rakeList = new List<double>();
+            int currentBetRows = 0;
             int sumbet = 0;
             int winbet = 0;
-            for (int m = 0; m < 9; m++)
+            while (currentBetRows < betTimes)
             {
-                for (int t = 0; t < nbets; t++)
+                if (results == null || nbets > results.Count())
                 {
-                    dataGridView1.Rows[t].Cells[m].Value = 0;
+                    MessageBox.Show("Не найдено столько событий!");
+                    return;
                 }
-            }
-            Random rand = new Random();
-            while (mres.Count() < nbets)
-            {
-                int rnd = rand.Next(0, results.Count());
-                if (!mres.Contains(results.ElementAt(rnd)))
-                    mres.Add(results.ElementAt(rnd));
-            }
-            int currentRow = 0;
-            for (int i = 0; i < mres.Count(); i++)
-            {
-                List<line> thisline = new List<line>();
-                foreach (line ln in lines)
+                int hours = (int)numericHours.Value;
+                List<result> mres = new List<result>();
+                List<int> mass = new List<int>();
+                dataGridView1.RowCount = nbets;
+                
+                for (int m = 0; m < 9; m++)
                 {
-                    int hrs = (mres[i].data - ln.data).Hours + (mres[i].data - ln.data).Days * 24;
-                    if (mres[i].team1 == ln.team1 && mres[i].team2 == ln.team2 && hrs < hours)
+                    for (int t = 0; t < nbets; t++)
                     {
-                        thisline.Add(ln); // выбираем подходящие лайны к выбранным событиям
+                        dataGridView1.Rows[t].Cells[m].Value = 0;
                     }
                 }
-
-                bool checkListAccepted = false;
-                int bet = rand.Next(7);
-                while (!checkListAccepted)
+                Random rand = new Random();
+                while (mres.Count() < nbets)
                 {
-                    bet = rand.Next(7);
-                    if (bet <= 2 && checkedListBox1.GetItemChecked(0))
-                        checkListAccepted = true;
-                    if (bet >= 5 && checkedListBox1.GetItemChecked(2))
-                        checkListAccepted = true;
-                    if (bet >= 3 && checkedListBox1.GetItemChecked(1) && bet <= 4)
-                        checkListAccepted = true;
+                    int rnd = rand.Next(0, results.Count());
+                    if (!mres.Contains(results.ElementAt(rnd)))
+                        mres.Add(results.ElementAt(rnd));
                 }
-                int betline = rand.Next(thisline.Count());
-
-                if (thisline.Count() != 0)
+                int currentRow = 0;
+                for (int i = 0; i < mres.Count(); i++)
                 {
-                    dataGridView1.Rows[currentRow].Cells[0].Value = thisline[betline].team1;
-                    dataGridView1.Rows[currentRow].Cells[1].Value = thisline[betline].team2;
-                    dataGridView1.Rows[currentRow].Cells[2].Value = mres[i].score1;
-                    dataGridView1.Rows[currentRow].Cells[3].Value = mres[i].score2;
-                    sumbet = sumbet + 1000;
-                    switch (bet)
+                    List<line> thisline = new List<line>();
+                    foreach (line ln in lines)
                     {
-                        case 0:
-                            if (thisline[betline].win1 == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
+                        int hrs = (mres[i].data - ln.data).Hours + (mres[i].data - ln.data).Days * 24;
+                        if (mres[i].team1 == ln.team1 && mres[i].team2 == ln.team2 && hrs < hours)
+                        {
+                            thisline.Add(ln); // выбираем подходящие лайны к выбранным событиям
+                        }
+                    }
+
+                    bool checkListAccepted = false;
+                    int bet = rand.Next(7);
+                    while (!checkListAccepted)
+                    {
+                        bet = rand.Next(7);
+                        if (bet <= 2 && checkedListBox1.GetItemChecked(0))
+                            checkListAccepted = true;
+                        if (bet >= 5 && checkedListBox1.GetItemChecked(2))
+                            checkListAccepted = true;
+                        if (bet >= 3 && checkedListBox1.GetItemChecked(1) && bet <= 4)
+                            checkListAccepted = true;
+                    }
+                    int betline = rand.Next(thisline.Count());
+
+                    if (thisline.Count() != 0)
+                    {
+                        dataGridView1.Rows[currentRow].Cells[0].Value = thisline[betline].team1;
+                        dataGridView1.Rows[currentRow].Cells[1].Value = thisline[betline].team2;
+                        dataGridView1.Rows[currentRow].Cells[2].Value = mres[i].score1;
+                        dataGridView1.Rows[currentRow].Cells[3].Value = mres[i].score2;
+                        sumbet = sumbet + 1000;
+                        switch (bet)
+                        {
+                            case 0:
+                                if (thisline[betline].win1 == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "П1";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].win1;
+                                if (mres[i].score1 > mres[i].score2)
+                                {
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                    winbet = (winbet + Convert.ToInt32(thisline[betline].win1 * 1000));
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].win1 * 1000);
+                                }
+                                else
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                rakeList.Add(thisline[betline].rake);
+                                currentRow++;
                                 break;
-                            }
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "П1";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].win1;
-                            if (mres[i].score1 > mres[i].score2)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].win1 * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].win1 * 1000);
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
-                        case 1:
-                            if (thisline[betline].x == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
+                            case 1:
+                                if (thisline[betline].x == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "X";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].x;
+                                if (mres[i].score1 == mres[i].score2 && thisline[betline].x != 0)
+                                {
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                    winbet = (winbet + Convert.ToInt32(thisline[betline].x * 1000));
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].x * 1000);
+                                }
+                                else
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                rakeList.Add(thisline[betline].rake);
+                                currentRow++;
                                 break;
-                            }
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "X";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].x;
-                            if (mres[i].score1 == mres[i].score2 && thisline[betline].x != 0)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].x * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].x * 1000);
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
-                        case 2:
-                            if (thisline[betline].win2 == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
+                            case 2:
+                                if (thisline[betline].win2 == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "П2";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].win2;
+                                if (mres[i].score2 > mres[i].score1 && thisline[betline].win2 != 0)
+                                {
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                    winbet = (winbet + Convert.ToInt32(thisline[betline].win2 * 1000));
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].win2 * 1000);
+                                }
+                                else
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                rakeList.Add(thisline[betline].rake);
+                                currentRow++;
                                 break;
-                            }
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "П2";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].win2;
-                            if (mres[i].score2 > mres[i].score1 && thisline[betline].win2 != 0)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].win2 * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].win2 * 1000);
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
-                        case 3:
-                            if (thisline[betline].fora1k == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
-                                break;
-                            }
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "Фора1";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].fora1k;
-                            dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].fora1;
-                            if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
-                            {
-                                if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 + 0.25 > 0) // 1:2 vs 0.75 - win
+                            case 3:
+                                if (thisline[betline].fora1k == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "Фора1";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].fora1k;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].fora1;
+                                if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
+                                {
+                                    if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 + 0.25 > 0) // 1:2 vs 0.75 - win
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000));
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora1k * 1000);
+                                    }
+                                    else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 + 0.25 == 0) // 1:2 vs 0.75 - расход 1/2 + проеб
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
+                                        winbet = (winbet + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = 500;
+                                    }
+                                    else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 - 0.25 == 0) // 1:2 vs 1.25 - расход 1/2 + win 1/2 
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "+3/4";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000 / 2) + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora1k * 1000 / 2) + 1000 / 2;
+                                    }
+                                    else
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                }
+                                else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 > 0)
                                 {
                                     dataGridView1.Rows[currentRow].Cells[7].Value = 1;
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
                                     winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000));
                                     dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora1k * 1000);
                                 }
-                                else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 + 0.25 == 0) // 1:2 vs 0.75 - расход 1/2 + проеб
+                                else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 == 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                    winbet = (winbet + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 500;
-                                }
-                                else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 - 0.25 == 0) // 1:2 vs 1.25 - расход 1/2 + win 1/2 
-                                {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "+3/4";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000 / 2) + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora1k * 1000 / 2) + 1000 / 2;
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
+                                    winbet = (winbet + 1000);
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
                                 }
                                 else
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            }
-                            else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 > 0)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora1k * 1000);
-                            }
-                            else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 == 0)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                winbet = (winbet + 1000);
-                                dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
-                        case 4:
-                            if (thisline[betline].fora2k == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
+                                currentRow++;
                                 break;
-                            }
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "Фора2";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].fora2k;
-                            dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].fora1;
+                            case 4:
+                                if (thisline[betline].fora2k == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "Фора2";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].fora2k;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].fora1;
 
-                            if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
-                            {
-                                if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 + 0.25 > 0) // 2:1 vs 0.75 - win
+                                if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
+                                {
+                                    if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 + 0.25 > 0) // 2:1 vs 0.75 - win
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000));
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora2k * 1000);
+                                    }
+                                    else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 + 0.25 == 0) // 2:1 vs 0.75 - расход 1/2 + проеб
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
+                                        winbet = (winbet + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = 500;
+                                    }
+                                    else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 - 0.25 == 0) // 2:1 vs 1.25 - расход 1/2 + win 1/2 
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "+3/4";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000 / 2) + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora2k * 1000 / 2) + 1000 / 2;
+                                    }
+                                    else
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                }
+                                else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 > 0)
                                 {
                                     dataGridView1.Rows[currentRow].Cells[7].Value = 1;
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
                                     winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000));
                                     dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora2k * 1000);
                                 }
-                                else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 + 0.25 == 0) // 2:1 vs 0.75 - расход 1/2 + проеб
+                                else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 == 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                    winbet = (winbet + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 500;
-                                }
-                                else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 - 0.25 == 0) // 2:1 vs 1.25 - расход 1/2 + win 1/2 
-                                {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "+3/4";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000 / 2) + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora2k * 1000 / 2) + 1000 / 2;
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
+                                    winbet = (winbet + 1000);
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
                                 }
                                 else
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            }
-                            else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 > 0)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora2k * 1000);
-                            }
-                            else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 == 0)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                winbet = (winbet + 1000);
-                                dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
-                        case 5:
-                            if (thisline[betline].totalb == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
+                                currentRow++;
                                 break;
-                            }
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "ТБ";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].totalb;
-                            dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].total;
-                            if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
-                            {
-                                if (mres[i].score1 + mres[i].score2 > thisline[betline].total + 0.25) // 3 vs 2.25 - win
+                            case 5:
+                                if (thisline[betline].totalb == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "ТБ";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].totalb;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].total;
+                                if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
+                                {
+                                    if (mres[i].score1 + mres[i].score2 > thisline[betline].total + 0.25) // 3 vs 2.25 - win
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000));
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000);
+                                    }
+                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + проеб
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
+                                        winbet = (winbet + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = 500;
+                                    }
+                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + win 1/2 
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000 / 2) + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000 / 2) + 1000 / 2;
+                                    }
+                                    else
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                }
+                                else if (mres[i].score1 + mres[i].score2 > thisline[betline].total)
                                 {
                                     dataGridView1.Rows[currentRow].Cells[7].Value = 1;
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
                                     winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000));
                                     dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000);
                                 }
-                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + проеб
+                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                    winbet = (winbet + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 500;
-                                }
-                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + win 1/2 
-                                {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000 / 2) + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000 / 2) + 1000 / 2;
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
+                                    winbet = winbet + 1000;
                                 }
                                 else
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            }
-                            else if (mres[i].score1 + mres[i].score2 > thisline[betline].total)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000);
-                            }
-                            else if (mres[i].score1 + mres[i].score2 == thisline[betline].total)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
-                                winbet = winbet + 1000;
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
-                        case 6:
-                            dataGridView1.Rows[currentRow].Cells[4].Value = "ТМ";
-                            dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].totalm;
-                            dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].total;
-                            if (thisline[betline].totalm == 0)
-                            {
-                                sumbet = sumbet - 1000;
-                                if (checkBoxAll.Checked)
-                                    i--;
+                                currentRow++;
                                 break;
-                            }
-                            if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
-                            {
-                                if (mres[i].score1 + mres[i].score2 < thisline[betline].total - 0.25) // 2 vs 2.75 win
+                            case 6:
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "ТМ";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].totalm;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].total;
+                                if (thisline[betline].totalm == 0)
+                                {
+                                    sumbet = sumbet - 1000;
+                                    if (checkBoxAll.Checked)
+                                        i--;
+                                    break;
+                                }
+                                if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
+                                {
+                                    if (mres[i].score1 + mres[i].score2 < thisline[betline].total - 0.25) // 2 vs 2.75 win
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000));
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000);
+                                    }
+                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + проеб
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
+                                        winbet = (winbet + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = 500;
+                                    }
+                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + win 1/2 
+                                    {
+                                        dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
+                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000 / 2) + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000 / 2) + 1000 / 2;
+                                    }
+                                    else
+                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                }
+                                else if (mres[i].score1 + mres[i].score2 < thisline[betline].total)
                                 {
                                     dataGridView1.Rows[currentRow].Cells[7].Value = 1;
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
                                     winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000));
                                     dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000);
                                 }
-                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + проеб
+                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total) // 2 vs 2
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                    winbet = (winbet + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 500;
-                                }
-                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + win 1/2 
-                                {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000 / 2) + 1000 / 2);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000 / 2) + 1000 / 2;
+                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
+                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
+                                    winbet = winbet + 1000;
                                 }
                                 else
                                     dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            }
-                            else if (mres[i].score1 + mres[i].score2 < thisline[betline].total)
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000));
-                                dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000);
-                            }
-                            else if (mres[i].score1 + mres[i].score2 == thisline[betline].total) // 2 vs 2
-                            {
-                                dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
-                                winbet = winbet + 1000;
-                            }
-                            else
-                                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                            currentRow++;
-                            break;
+                                currentRow++;
+                                break;
+                        }
                     }
                 }
+                labelbets.Visible = true;
+                labelwins.Visible = true;
+                labelroipers.Visible = true;
+                labelroi.Visible = true;
+                labelrake.Visible = true;
+                labelrakeavg.Visible = true;
+                labelbets.Text = "поставлено " + sumbet.ToString();
+                for (int i = dataGridView1.Rows.Count - 1; i >= 0; i--)
+                {
+                    DataGridViewRow dr = dataGridView1.Rows[i];
+                    if (i >= currentRow)
+                        dataGridView1.Rows.Remove(dr);
+                }
+                labelwins.Text = "выйграно " + winbet.ToString();
+                double roi = (Convert.ToDouble(winbet) - Convert.ToDouble(sumbet)) / Convert.ToDouble(sumbet);
+                roiList.Add(roi);
+                labelroipers.Text = roi.ToString("0.000");
+                currentBetRows++;
             }
-            labelbets.Visible = true;
-            labelwins.Visible = true;
-            labelroipers.Visible = true;
-            labelroi.Visible = true;
-            labelbets.Text = "поставлено " + sumbet.ToString();
-            for (int i = dataGridView1.Rows.Count-1; i >= 0; i--)
-            {
-                DataGridViewRow dr = dataGridView1.Rows[i];
-                if (i >= currentRow)
-                    dataGridView1.Rows.Remove(dr);
-            }
-            labelwins.Text = "выйграно " + winbet.ToString();
-            double roi = (Convert.ToDouble(winbet) - Convert.ToDouble(sumbet)) / Convert.ToDouble(sumbet);
-            labelroipers.Text = roi.ToString("0.000");
+            labelroipers.Text = roiList.Average().ToString("0.000");
+            labelrakeavg.Text = rakeList.Average().ToString("0.000"); 
+
         }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -508,6 +527,7 @@ namespace bets
                     checkedListBox1.SetItemChecked(i, true);
             }
         }
+
     }
 
 }

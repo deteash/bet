@@ -20,5 +20,6 @@ namespace bets
         public double totalb;
         public double totalm;
         public DateTime data;
+        public double rake;
     }
 }
