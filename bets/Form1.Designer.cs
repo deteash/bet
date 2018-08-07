@@ -60,22 +60,27 @@
             this.numericHours = new System.Windows.Forms.NumericUpDown();
             this.numericReadLines = new System.Windows.Forms.NumericUpDown();
             this.numericBetTimes = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
             this.labelrakeavg = new System.Windows.Forms.Label();
             this.labelrake = new System.Windows.Forms.Label();
-            this.checkBoxDanilich = new System.Windows.Forms.CheckBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.radioButtonDanilich = new System.Windows.Forms.RadioButton();
+            this.radioButtonNaverochku = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.checkBoxNoDraw = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericHours)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericReadLines)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBetTimes)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(29, 57);
+            this.button1.Location = new System.Drawing.Point(29, 48);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 39);
+            this.button1.Size = new System.Drawing.Size(101, 35);
             this.button1.TabIndex = 0;
             this.button1.Text = "заебашить пинакл";
             this.button1.UseVisualStyleBackColor = true;
@@ -88,7 +93,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(429, 31);
+            this.label1.Location = new System.Drawing.Point(429, 10);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(78, 13);
             this.label1.TabIndex = 2;
@@ -98,7 +103,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(429, 61);
+            this.label2.Location = new System.Drawing.Point(429, 34);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(97, 13);
             this.label2.TabIndex = 3;
@@ -137,7 +142,7 @@
             "П1,П2,X",
             "Фора",
             "Тотал"});
-            this.checkedListBox1.Location = new System.Drawing.Point(376, 89);
+            this.checkedListBox1.Location = new System.Drawing.Point(375, 58);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.Size = new System.Drawing.Size(64, 45);
             this.checkedListBox1.TabIndex = 8;
@@ -146,7 +151,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.label5.Location = new System.Drawing.Point(48, 162);
+            this.label5.Location = new System.Drawing.Point(48, 169);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(59, 13);
             this.label5.TabIndex = 9;
@@ -155,7 +160,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(48, 175);
+            this.label6.Location = new System.Drawing.Point(48, 182);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(46, 13);
             this.label6.TabIndex = 10;
@@ -164,7 +169,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(26, 9);
+            this.label7.Location = new System.Drawing.Point(26, 6);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(81, 13);
             this.label7.TabIndex = 11;
@@ -173,7 +178,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(56, 99);
+            this.label8.Location = new System.Drawing.Point(53, 156);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(41, 13);
             this.label8.TabIndex = 13;
@@ -182,9 +187,9 @@
             // 
             // buttonBet
             // 
-            this.buttonBet.Location = new System.Drawing.Point(376, 144);
+            this.buttonBet.Location = new System.Drawing.Point(29, 89);
             this.buttonBet.Name = "buttonBet";
-            this.buttonBet.Size = new System.Drawing.Size(64, 24);
+            this.buttonBet.Size = new System.Drawing.Size(54, 35);
             this.buttonBet.TabIndex = 14;
             this.buttonBet.Text = "BET";
             this.buttonBet.UseVisualStyleBackColor = true;
@@ -290,7 +295,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(29, 122);
+            this.progressBar1.Location = new System.Drawing.Point(29, 127);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(101, 23);
             this.progressBar1.TabIndex = 16;
@@ -319,7 +324,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(48, 190);
+            this.label3.Location = new System.Drawing.Point(121, 190);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(35, 13);
             this.label3.TabIndex = 19;
@@ -329,17 +334,17 @@
             // checkBoxAll
             // 
             this.checkBoxAll.AutoSize = true;
-            this.checkBoxAll.Location = new System.Drawing.Point(376, 174);
+            this.checkBoxAll.Location = new System.Drawing.Point(440, 58);
             this.checkBoxAll.Name = "checkBoxAll";
-            this.checkBoxAll.Size = new System.Drawing.Size(59, 17);
+            this.checkBoxAll.Size = new System.Drawing.Size(102, 17);
             this.checkBoxAll.TabIndex = 20;
-            this.checkBoxAll.Text = "на все";
+            this.checkBoxAll.Text = "больше ставок";
             this.checkBoxAll.UseVisualStyleBackColor = true;
             this.checkBoxAll.CheckedChanged += new System.EventHandler(this.checkBoxAll_CheckedChanged);
             // 
             // numericBets
             // 
-            this.numericBets.Location = new System.Drawing.Point(375, 29);
+            this.numericBets.Location = new System.Drawing.Point(375, 6);
             this.numericBets.Maximum = new decimal(new int[] {
             25000,
             0,
@@ -356,7 +361,7 @@
             // 
             // numericHours
             // 
-            this.numericHours.Location = new System.Drawing.Point(375, 61);
+            this.numericHours.Location = new System.Drawing.Point(375, 32);
             this.numericHours.Name = "numericHours";
             this.numericHours.Size = new System.Drawing.Size(48, 20);
             this.numericHours.TabIndex = 22;
@@ -368,7 +373,7 @@
             // 
             // numericReadLines
             // 
-            this.numericReadLines.Location = new System.Drawing.Point(29, 31);
+            this.numericReadLines.Location = new System.Drawing.Point(29, 22);
             this.numericReadLines.Maximum = new decimal(new int[] {
             25000,
             0,
@@ -380,24 +385,15 @@
             // 
             // numericBetTimes
             // 
-            this.numericBetTimes.Location = new System.Drawing.Point(447, 147);
+            this.numericBetTimes.Location = new System.Drawing.Point(89, 98);
             this.numericBetTimes.Name = "numericBetTimes";
-            this.numericBetTimes.Size = new System.Drawing.Size(36, 20);
+            this.numericBetTimes.Size = new System.Drawing.Size(40, 20);
             this.numericBetTimes.TabIndex = 24;
             this.numericBetTimes.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(489, 150);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(25, 13);
-            this.label4.TabIndex = 25;
-            this.label4.Text = "раз";
             // 
             // labelrakeavg
             // 
@@ -420,25 +416,83 @@
             this.labelrake.Text = "avg rake";
             this.labelrake.Visible = false;
             // 
-            // checkBoxDanilich
+            // checkBox1
             // 
-            this.checkBoxDanilich.AutoSize = true;
-            this.checkBoxDanilich.Location = new System.Drawing.Point(432, 174);
-            this.checkBoxDanilich.Name = "checkBoxDanilich";
-            this.checkBoxDanilich.Size = new System.Drawing.Size(104, 17);
-            this.checkBoxDanilich.TabIndex = 28;
-            this.checkBoxDanilich.Text = "Данилыч стайл";
-            this.checkBoxDanilich.UseVisualStyleBackColor = true;
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(187, 6);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(126, 17);
+            this.checkBox1.TabIndex = 29;
+            this.checkBox1.Text = "нах странные форы";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonDanilich
+            // 
+            this.radioButtonDanilich.AutoSize = true;
+            this.radioButtonDanilich.Location = new System.Drawing.Point(6, 20);
+            this.radioButtonDanilich.Name = "radioButtonDanilich";
+            this.radioButtonDanilich.Size = new System.Drawing.Size(103, 17);
+            this.radioButtonDanilich.TabIndex = 31;
+            this.radioButtonDanilich.TabStop = true;
+            this.radioButtonDanilich.Text = "Данилыч стайл";
+            this.radioButtonDanilich.UseVisualStyleBackColor = true;
+            this.radioButtonDanilich.CheckedChanged += new System.EventHandler(this.radioButtonDanilich_CheckedChanged);
+            // 
+            // radioButtonNaverochku
+            // 
+            this.radioButtonNaverochku.AutoSize = true;
+            this.radioButtonNaverochku.Location = new System.Drawing.Point(6, 41);
+            this.radioButtonNaverochku.Name = "radioButtonNaverochku";
+            this.radioButtonNaverochku.Size = new System.Drawing.Size(79, 17);
+            this.radioButtonNaverochku.TabIndex = 32;
+            this.radioButtonNaverochku.TabStop = true;
+            this.radioButtonNaverochku.Text = "Наверочку";
+            this.radioButtonNaverochku.UseVisualStyleBackColor = true;
+            this.radioButtonNaverochku.CheckedChanged += new System.EventHandler(this.radioButtonNaverochku_CheckedChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.radioButton1);
+            this.groupBox1.Controls.Add(this.radioButtonDanilich);
+            this.groupBox1.Controls.Add(this.radioButtonNaverochku);
+            this.groupBox1.Location = new System.Drawing.Point(375, 113);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(125, 87);
+            this.groupBox1.TabIndex = 33;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "ракомод";
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Location = new System.Drawing.Point(6, 62);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(62, 17);
+            this.radioButton1.TabIndex = 33;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "обычно";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxNoDraw
+            // 
+            this.checkBoxNoDraw.AutoSize = true;
+            this.checkBoxNoDraw.Location = new System.Drawing.Point(440, 81);
+            this.checkBoxNoDraw.Name = "checkBoxNoDraw";
+            this.checkBoxNoDraw.Size = new System.Drawing.Size(81, 17);
+            this.checkBoxNoDraw.TabIndex = 34;
+            this.checkBoxNoDraw.Text = "без ничьих";
+            this.checkBoxNoDraw.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(550, 644);
-            this.Controls.Add(this.checkBoxDanilich);
+            this.Controls.Add(this.checkBoxNoDraw);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.labelrakeavg);
             this.Controls.Add(this.labelrake);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.numericBetTimes);
             this.Controls.Add(this.numericReadLines);
             this.Controls.Add(this.numericHours);
@@ -470,6 +524,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericHours)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericReadLines)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBetTimes)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -508,10 +564,14 @@
         private System.Windows.Forms.NumericUpDown numericHours;
         private System.Windows.Forms.NumericUpDown numericReadLines;
         private System.Windows.Forms.NumericUpDown numericBetTimes;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label labelrakeavg;
         private System.Windows.Forms.Label labelrake;
-        private System.Windows.Forms.CheckBox checkBoxDanilich;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.RadioButton radioButtonDanilich;
+        private System.Windows.Forms.RadioButton radioButtonNaverochku;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.CheckBox checkBoxNoDraw;
     }
 }
 
