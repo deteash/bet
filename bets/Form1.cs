@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,7 +17,11 @@ namespace bets
     {
         private List<line> lines;
         private List<result> results;
-        private object saveFileDialog1;
+        private int sumbet = 0;
+        private int winbet = 0;
+        List<double> roiList = new List<double>();
+        public static readonly ILog log = LogManager.GetLogger(typeof(Program));
+
 
         public Form1()
         {
@@ -24,10 +29,15 @@ namespace bets
             checkedListBox1.SetItemChecked(0, true);
             checkedListBox1.SetItemChecked(1, true);
             checkedListBox1.SetItemChecked(2, true);
+            infoWindow.Visible = false;
+            tabControlDanilo.Visible = false;
+            log4net.Config.XmlConfigurator.Configure();
+            log.Info("Form INIT");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            log.Info("Reading xls");
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 lines = new List<line>();
@@ -41,6 +51,7 @@ namespace bets
                 int read = (int)numericReadLines.Value;
                 progressBar1.Visible = true;
                 progressBar1.Maximum = read;
+                this.ShowInTaskbar = true;
                 string pattern1 = "yyyy-MM-dd HH:mm";
                 string pattern2 = "dd.MM.yyyy HH:mm";
                 string pattern3 = "dd.MM.yyyy H:mm";
@@ -127,470 +138,465 @@ namespace bets
 
         private void button2_Click(object sender, EventArgs e)
         {
+
             int nbets = Convert.ToInt32(numericBets.Value);
-            int betTimes = Convert.ToInt32(numericBetTimes.Value);
-            List<double> roiList = new List<double>();
+            int guys = Convert.ToInt32(numericBetTimes.Value);
+            log.Info("##################### NEW BETS ###########################");
+            log.Info("BET pressed " + nbets + " bets " + guys + " times");
             List<double> rakeList = new List<double>();
-            int currentBetRows = 0;
-            int sumbet = 0;
-            int winbet = 0;
+            List<int> allowedBetsList = ReadAllowedBets();
+            log.Info("allowed bet are: " + string.Join(", ", allowedBetsList.ToArray()));
+            int hoursTo = (int)numericHoursTo.Value;
+            int hoursFrom = (int)numericHoursFrom.Value;
+            roiList.Clear();
+            int currentGuy = 0;
+            sumbet = 0;
+            winbet = 0;
             labelroi.Visible = false;
             labelrakeavg.Visible = false;
             labelroipers.Visible = false;
             labelrake.Visible = false;
-            while (currentBetRows < betTimes)
+            Random rand = new Random();
+
+            while (currentGuy < guys)
             {
+                log.Info("guy # " + currentGuy + " starts bets");
+                int guyWinBet = 0;
+                int guySumBet = 0;
                 if (results == null || nbets > results.Count())
                 {
                     MessageBox.Show("Не найдено столько событий!");
+                    log.Warn("bets>events");
                     return;
                 }
-                int hours = (int)numericHours.Value;
-                List<result> mres = new List<result>();
-                List<int> mass = new List<int>();
+                List<result> selectedResults = new List<result>();
+                List<int> betEventIndexes = new List<int>();
                 dataGridView1.RowCount = nbets;
-                for (int m = 0; m < 9; m++)
-                {
-                    for (int t = 0; t < nbets; t++)
-                    {
-                        dataGridView1.Rows[t].Cells[m].Value = 0;
-                    }
-                }
-                Random rand = new Random();
-                while (mres.Count() < nbets)
+                while (selectedResults.Count() < nbets)
                 {
                     int rnd = rand.Next(0, results.Count());
-                    if (!mres.Contains(results.ElementAt(rnd)))
-                        mres.Add(results.ElementAt(rnd));
+                    if (!betEventIndexes.Contains(rnd))
+                    {
+                        betEventIndexes.Add(rnd);
+                        selectedResults.Add(results.ElementAt(rnd));
+                    }
                 }
+                log.Info("guy # " + currentGuy + " selects events: " + string.Join(", ", betEventIndexes.ToArray()));
                 int currentRow = 0;
-                for (int i = 0; i < mres.Count(); i++)
+                for (int i = 0; i < selectedResults.Count(); i++)
                 {
-                    List<line> thisline = new List<line>();
+                    log.Info("handling selected resulr # " + i);
+                    List<line> suitableLines = new List<line>();
                     foreach (line ln in lines)
                     {
-                        int hrs = (mres[i].data - ln.data).Hours + (mres[i].data - ln.data).Days * 24;
-                        if (mres[i].team1 == ln.team1 && mres[i].team2 == ln.team2 && hrs < hours)
+                        int hrs = (selectedResults[i].data - ln.data).Hours + (selectedResults[i].data - ln.data).Days * 24;
+                        if (selectedResults[i].team1 == ln.team1 && selectedResults[i].team2 == ln.team2 && hrs > hoursFrom && hrs < hoursTo)
                         {
-                            thisline.Add(ln); // выбираем подходящие лайны к выбранным событиям
+                            suitableLines.Add(ln);
                         }
                     }
 
-                    bool checkListAccepted = false;
-                    int bet = rand.Next(7);
-                    while (!checkListAccepted)
+                    if (suitableLines.Count() == 0)
                     {
-                        bet = rand.Next(7);
-
-                        if (bet <= 2 && checkedListBox1.GetItemChecked(0))
-                            checkListAccepted = true;
-                        if (bet >= 5 && checkedListBox1.GetItemChecked(2))
-                            checkListAccepted = true;
-                        if (bet >= 3 && checkedListBox1.GetItemChecked(1) && bet <= 4)
-                            checkListAccepted = true;
+                        log.Warn("GUY # " + currentGuy + " CAN'T FIND A LINE FOR EVENT # " + i + " (" + selectedResults[i].team1 + " vs " + selectedResults[i].team2 + ")");
                     }
-                    int betline = rand.Next(thisline.Count());
-                    if (thisline.Count() != 0)
+                    else
                     {
-                        dataGridView1.Rows[currentRow].Cells[0].Value = thisline[betline].team1;
-                        dataGridView1.Rows[currentRow].Cells[1].Value = thisline[betline].team2;
-                        dataGridView1.Rows[currentRow].Cells[2].Value = mres[i].score1;
-                        dataGridView1.Rows[currentRow].Cells[3].Value = mres[i].score2;
-                        sumbet = sumbet + 1000;
+                        int betline;
                         if (checkBoxFreshLine.Checked)
+                        {
                             betline = 0;
-                        if (checkBoxNoDraw.Checked)
-                            bet = 0;
-                        if (radioButtonDanilich.Checked)
+                        }
+                        else
                         {
-                            if (bet == 0 && thisline[betline].win2 > thisline[betline].win1)
+                            betline = rand.Next(suitableLines.Count());
+                        }
+                        dataGridView1.Rows[currentRow].Cells[0].Value = suitableLines[betline].team1;
+                        dataGridView1.Rows[currentRow].Cells[1].Value = suitableLines[betline].team2;
+                        dataGridView1.Rows[currentRow].Cells[2].Value = selectedResults[i].score1;
+                        dataGridView1.Rows[currentRow].Cells[3].Value = selectedResults[i].score2;
+                        guySumBet = guySumBet + 1000;
+                        int bet = 404;
+                        while (!allowedBetsList.Contains(bet))
+                        {
+                            bet = rand.Next(7);
+                        }
+                        if (radioButtonDanilich.Checked) // Danilich style
+                        {
+                            double coeffMore = Convert.ToDouble(numericBetCoeffMore.Value);
+                            if (bet < 3)
+                            {
+                                if (suitableLines[betline].win2 > suitableLines[betline].win1 && suitableLines[betline].win2 > coeffMore)
+                                    bet = 2;
+                                else if (suitableLines[betline].win1 > suitableLines[betline].win2 && suitableLines[betline].win1 > coeffMore)
+                                    bet = 0;
+                            }
+                            else if (bet == 3 || bet == 4)
+                            {
+                                if (suitableLines[betline].fora1k > suitableLines[betline].fora2k && suitableLines[betline].fora1k > coeffMore)
+                                    bet = 3;
+                                else if (suitableLines[betline].fora2k > suitableLines[betline].fora1k && suitableLines[betline].fora2k > coeffMore)
+                                    bet = 4;
+                            }
+                            else if (bet == 5 || bet == 6)
+                            {
+                                if (suitableLines[betline].totalb > suitableLines[betline].totalm && suitableLines[betline].totalb > coeffMore)
+                                    bet = 5;
+                                else if (suitableLines[betline].totalm > suitableLines[betline].totalb && suitableLines[betline].totalm > coeffMore)
+                                    bet = 6;
+                            }
+                            else
+                                bet = 404;
+                        }
+                        if (radioButtonNaverochku.Checked)//Naverochku no fully implemented
+                        {
+                            if (bet == 0 && suitableLines[betline].win2 < suitableLines[betline].win1)
                                 bet = 2;
-                            else if (bet == 2 && thisline[betline].win1 > thisline[betline].win2)
+                            else if (bet == 2 && suitableLines[betline].win1 < suitableLines[betline].win2)
                                 bet = 0;
                         }
-                        if (radioButtonNaverochku.Checked)
-                        {
-                            if (bet == 0 && thisline[betline].win2 < thisline[betline].win1)
-                                bet = 2;
-                            else if (bet == 2 && thisline[betline].win1 < thisline[betline].win2)
-                                bet = 0;
-                        }
-                        switch (bet)
+                        log.Info("guy # " + currentGuy + " wants to bet on " + bet + " in line # " + betline);
+
+                        switch (bet) // handle bet
                         {
                             case 0:
-                                if (thisline[betline].win1 == 0)
+                                if (suitableLines[betline].win1 == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
-                                dataGridView1.Rows[currentRow].Cells[4].Value = "П1";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].win1;
-                                if (mres[i].score1 > mres[i].score2)
+                                if (selectedResults[i].score1 > selectedResults[i].score2)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].win1 * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].win1 * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].win1 * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].win1 * 1000));
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                                rakeList.Add(thisline[betline].rake);
+                                {
+                                    markAsLoose(currentRow);
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "П1";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].win1;
+                                rakeList.Add(suitableLines[betline].rake);
                                 currentRow++;
                                 break;
                             case 1:
-                                if (thisline[betline].x == 0)
+                                if (suitableLines[betline].x == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
-                                dataGridView1.Rows[currentRow].Cells[4].Value = "X";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].x;
-                                if (mres[i].score1 == mres[i].score2 && thisline[betline].x != 0)
+                                if (selectedResults[i].score1 == selectedResults[i].score2)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].x * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].x * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].x * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].x * 1000));
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                                rakeList.Add(thisline[betline].rake);
+                                {
+                                    markAsLoose(currentRow);
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "X";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].x;
+                                rakeList.Add(suitableLines[betline].rake);
                                 currentRow++;
                                 break;
                             case 2:
-                                if (thisline[betline].win2 == 0)
+                                if (suitableLines[betline].win2 == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
-                                dataGridView1.Rows[currentRow].Cells[4].Value = "П2";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].win2;
-                                if (mres[i].score2 > mres[i].score1 && thisline[betline].win2 != 0)
+
+                                if (selectedResults[i].score2 > selectedResults[i].score1 && suitableLines[betline].win2 != 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].win2 * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].win2 * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].win2 * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].win2 * 1000));
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                                rakeList.Add(thisline[betline].rake);
+                                { 
+                                    markAsLoose(currentRow);
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "П2";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].win2;
+                                rakeList.Add(suitableLines[betline].rake);
                                 currentRow++;
                                 break;
                             case 3:
-                                if (thisline[betline].fora1k == 0)
+                                if (suitableLines[betline].fora1k == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
                                 dataGridView1.Rows[currentRow].Cells[4].Value = "Фора1";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].fora1k;
-                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].fora1;
-                                if (thisline[betline].fora1.ToString().Contains("25") || thisline[betline].fora1.ToString().Contains("75") && checkBox1.Checked)
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].fora1k;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = suitableLines[betline].fora1;
+                                if (suitableLines[betline].fora1.ToString().Contains("25") || suitableLines[betline].fora1.ToString().Contains("75") && checkBox1.Checked)
                                 {
-                                    sumbet = sumbet - 1000;
-                                    break;
-                                    /* double foraWins = 0;
-                                     double foraReturn = 0;
+                                     int foraWins = 0;
+                                     int foraReturn = 0;
                                      double tWin = 0;
-                                     if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 + 0.25 > 0) // 1:2 vs 0.75 - win
+                                     if (selectedResults[i].score1 - selectedResults[i].score2 + suitableLines[betline].fora1 + 0.25 > 0) // 1:2 vs 0.75 - win
                                      {
                                          foraWins++;
-                                         winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000 / 2));
-                                         tWin += Convert.ToInt32(thisline[betline].fora1k * 1000 / 2);
+                                         guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].fora1k * 1000 / 2));
+                                         tWin += Convert.ToInt32(suitableLines[betline].fora1k * 1000 / 2);
                                      }
-                                     if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 - 0.25 > 0) // 1:2 vs 0.75 - win
+                                     if (selectedResults[i].score1 - selectedResults[i].score2 + suitableLines[betline].fora1 - 0.25 > 0) // 1:2 vs 0.75 - win
                                      {
                                          foraWins++;
-                                         winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000 / 2));
-                                         tWin += Convert.ToInt32(thisline[betline].fora1k * 1000 / 2);
+                                         guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].fora1k * 1000 / 2));
+                                         tWin += Convert.ToInt32(suitableLines[betline].fora1k * 1000 / 2);
                                      }
-                                     if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 + 0.25 == 0) // 1:2 vs 0.75 - win
+                                     if (selectedResults[i].score1 - selectedResults[i].score2 + suitableLines[betline].fora1 + 0.25 == 0) // 1:2 vs 0.75 - win
                                      {
                                          foraReturn++;
-                                         winbet += 1000 / 2;
+                                         guyWinBet += 1000 / 2;
                                          tWin += 1000 / 2;
                                      }
-                                     if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 - 0.25 == 0) // 1:2 vs 0.75 - win
+                                     if (selectedResults[i].score1 - selectedResults[i].score2 + suitableLines[betline].fora1 - 0.25 == 0) // 1:2 vs 0.75 - win
                                      {
                                          foraReturn++;
-                                         winbet += 1000 / 2;
+                                         guyWinBet += 1000 / 2;
                                          tWin += 1000 / 2;
-                                     }
-                                     if (foraWins == 0 && foraReturn == 0)
-                                     {
-                                         dataGridView1.Rows[currentRow].Cells[7].Value = 0;
-                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                                     }
-                                     if (foraWins == 1 && foraReturn == 1)
-                                     {
-
-                                         dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
-                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                     }
-                                     if (foraWins == 2)
-                                     {
-
-                                         dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                     }
-                                     if (foraWins == 0 && foraReturn == 1)
-                                     {
-                                         dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
-                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
                                      }
                                      dataGridView1.Rows[currentRow].Cells[8].Value = tWin;
-                              */
                                 }
-
-                                else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 > 0)
+                                else if (selectedResults[i].score1 - selectedResults[i].score2 + suitableLines[betline].fora1 > 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].fora1k * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora1k * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].fora1k * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].fora1k * 1000));
                                 }
-                                else if (mres[i].score1 - mres[i].score2 + thisline[betline].fora1 == 0)
+                                else if (selectedResults[i].score1 - selectedResults[i].score2 + suitableLines[betline].fora1 == 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                    winbet = (winbet + 1000);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
+                                    markAsReturn(currentRow);
+                                    guyWinBet = (guyWinBet + 1000);
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                    markAsLoose(currentRow);
                                 currentRow++;
                                 break;
                             case 4:
-                                if (thisline[betline].fora2k == 0)
+                                if (suitableLines[betline].fora2k == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
                                 dataGridView1.Rows[currentRow].Cells[4].Value = "Фора2";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].fora2k;
-                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].fora1;
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].fora2k;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = suitableLines[betline].fora1;
 
-                                if (thisline[betline].fora1.ToString().Contains("25") || thisline[betline].fora1.ToString().Contains("75") && checkBox1.Checked)
+                                if (suitableLines[betline].fora1.ToString().Contains("25") || suitableLines[betline].fora1.ToString().Contains("75") && checkBox1.Checked)
                                 {
-                                    sumbet = sumbet - 1000;
-                                    break;/*
-                                    double foraWins = 0;
-                                    double foraReturn = 0;
+                                    int foraWins = 0;
+                                    int foraReturn = 0;
                                     double tWin = 0;
-                                    if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 + 0.25 > 0) // 1:2 vs 0.75 - win
+                                    if (selectedResults[i].score2 - selectedResults[i].score1 + suitableLines[betline].fora1 + 0.25 > 0) // 1:2 vs 0.75 - win
                                     {
                                         foraWins++;
-                                        winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000 / 2));
-                                        tWin += Convert.ToInt32(thisline[betline].fora2k * 1000 / 2);
+                                        guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].fora2k * 1000 / 2));
+                                        tWin += Convert.ToInt32(suitableLines[betline].fora2k * 1000 / 2);
                                     }
-                                    if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 - 0.25 > 0) // 1:2 vs 0.75 - win
+                                    if (selectedResults[i].score2 - selectedResults[i].score1 + suitableLines[betline].fora1 - 0.25 > 0) // 1:2 vs 0.75 - win
                                     {
                                         foraWins++;
-                                        winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000 / 2));
-                                        tWin += Convert.ToInt32(thisline[betline].fora2k * 1000 / 2);
+                                        guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].fora2k * 1000 / 2));
+                                        tWin += Convert.ToInt32(suitableLines[betline].fora2k * 1000 / 2);
                                     }
-                                    if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 + 0.25 == 0) // 1:2 vs 0.75 - win
+                                    if (selectedResults[i].score2 - selectedResults[i].score1 + suitableLines[betline].fora1 + 0.25 == 0) // 1:2 vs 0.75 - win
                                     {
                                         foraReturn++;
-                                        winbet += 1000 / 2;
+                                        guyWinBet += 1000 / 2;
                                         tWin += 1000 / 2;
                                     }
-                                    if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 - 0.25 == 0) // 1:2 vs 0.75 - win
+                                    if (selectedResults[i].score2 - selectedResults[i].score1 + suitableLines[betline].fora1 - 0.25 == 0) // 1:2 vs 0.75 - win
                                     {
                                         foraReturn++;
-                                        winbet += 1000 / 2;
+                                        guyWinBet += 1000 / 2;
                                         tWin += 1000 / 2;
                                     }
-                                    if (foraWins == 0 && foraReturn == 0)
-                                    {
-                                        dataGridView1.Rows[currentRow].Cells[7].Value = 0;
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
-                                    }
-                                    if (foraWins == 1 && foraReturn == 1)
-                                    {
-
-                                        dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                    }
-                                    if (foraWins == 2)
-                                    {
-
-                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    }
-                                    if (foraWins == 0 && foraReturn == 1)
-                                    {
-                                        dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                    }
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = tWin;*/
+                                    fora2575(currentRow, foraWins, foraReturn);
+                                    dataGridView1.Rows[currentRow].Cells[8].Value = tWin;
                                 }
 
-                                else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 > 0)
+                                else if (selectedResults[i].score2 - selectedResults[i].score1 + suitableLines[betline].fora1 > 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].fora2k * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].fora2k * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].fora2k * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].fora2k * 1000));
                                 }
-                                else if (mres[i].score2 - mres[i].score1 + thisline[betline].fora1 == 0)
+                                else if (selectedResults[i].score2 - selectedResults[i].score1 + suitableLines[betline].fora1 == 0)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                    winbet = (winbet + 1000);
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
+                                    markAsReturn(currentRow);
+                                    guyWinBet = (guyWinBet + 1000);
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                    markAsLoose(currentRow);
                                 currentRow++;
                                 break;
-                            case 5:
-                                if (thisline[betline].totalb == 0)
+                            case 5: // ТБ
+                                if (suitableLines[betline].totalb == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
-                                dataGridView1.Rows[currentRow].Cells[4].Value = "ТБ";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].totalb;
-                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].total;
-                                if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
+                                if (suitableLines[betline].total.ToString().Contains("25") || suitableLines[betline].total.ToString().Contains("75"))
                                 {
-                                    if (mres[i].score1 + mres[i].score2 > thisline[betline].total + 0.25) // 3 vs 2.25 - win
+                                    if (selectedResults[i].score1 + selectedResults[i].score2 > suitableLines[betline].total + 0.25) // 3 vs 2.25 - win
                                     {
-                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000));
-                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000);
+                                        markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].totalb * 1000));
+                                        guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].totalb * 1000));
                                     }
-                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + проеб
+                                    else if (selectedResults[i].score1 + selectedResults[i].score2 == suitableLines[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + проеб
                                     {
                                         dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                        winbet = (winbet + 1000 / 2);
+                                        guyWinBet = (guyWinBet + 1000 / 2);
                                         dataGridView1.Rows[currentRow].Cells[8].Value = 500;
                                     }
-                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + win 1/2 
+                                    else if (selectedResults[i].score1 + selectedResults[i].score2 == suitableLines[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + win 1/2 
                                     {
                                         dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000 / 2) + 1000 / 2);
-                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000 / 2) + 1000 / 2;
+                                        guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].totalb * 1000 / 2) + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(suitableLines[betline].totalb * 1000 / 2) + 1000 / 2;
                                     }
                                     else
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                        markAsLoose(currentRow);
                                 }
-                                else if (mres[i].score1 + mres[i].score2 > thisline[betline].total)
+                                else if (selectedResults[i].score1 + selectedResults[i].score2 > suitableLines[betline].total)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].totalb * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalb * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].totalb * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].totalb * 1000));
                                 }
-                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total)
+                                else if (selectedResults[i].score1 + selectedResults[i].score2 == suitableLines[betline].total)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
-                                    winbet = winbet + 1000;
+                                    markAsReturn(currentRow);
+                                    guyWinBet = guyWinBet + 1000;
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                {
+                                    markAsLoose(currentRow);
+                                }
+                                dataGridView1.Rows[currentRow].Cells[4].Value = "ТБ";
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].totalb;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = suitableLines[betline].total;
                                 currentRow++;
                                 break;
                             case 6:
                                 dataGridView1.Rows[currentRow].Cells[4].Value = "ТМ";
-                                dataGridView1.Rows[currentRow].Cells[6].Value = thisline[betline].totalm;
-                                dataGridView1.Rows[currentRow].Cells[5].Value = thisline[betline].total;
-                                if (thisline[betline].totalm == 0)
+                                dataGridView1.Rows[currentRow].Cells[6].Value = suitableLines[betline].totalm;
+                                dataGridView1.Rows[currentRow].Cells[5].Value = suitableLines[betline].total;
+                                if (suitableLines[betline].totalm == 0)
                                 {
-                                    sumbet = sumbet - 1000;
+
+                                    log.Warn("NO COEFF HERE!");
+                                    guySumBet = guySumBet - 1000;
                                     if (checkBoxAll.Checked)
+                                    {
+                                        log.Info("will try to find any coeffs here");
                                         i--;
+                                    }
                                     break;
                                 }
-                                if (thisline[betline].total.ToString().Contains("25") || thisline[betline].total.ToString().Contains("75"))
+                                if (suitableLines[betline].total.ToString().Contains("25") || suitableLines[betline].total.ToString().Contains("75"))
                                 {
-                                    if (mres[i].score1 + mres[i].score2 < thisline[betline].total - 0.25) // 2 vs 2.75 win
+                                    if (selectedResults[i].score1 + selectedResults[i].score2 < suitableLines[betline].total - 0.25) // 2 vs 2.75 win
                                     {
-                                        dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000));
-                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000);
+                                        markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].totalm * 1000));
+                                        guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].totalm * 1000));
                                     }
-                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + проеб
+                                    else if (selectedResults[i].score1 + selectedResults[i].score2 == suitableLines[betline].total + 0.25) // 3 vs 2.75 - расход 1/2 + проеб
                                     {
                                         dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
-                                        winbet = (winbet + 1000 / 2);
+                                        guyWinBet = (guyWinBet + 1000 / 2);
                                         dataGridView1.Rows[currentRow].Cells[8].Value = 500;
                                     }
-                                    else if (mres[i].score1 + mres[i].score2 == thisline[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + win 1/2 
+                                    else if (selectedResults[i].score1 + selectedResults[i].score2 == suitableLines[betline].total - 0.25) // 2 vs 2.25 - расход 1/2 + win 1/2 
                                     {
                                         dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
                                         dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
-                                        winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000 / 2) + 1000 / 2);
-                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000 / 2) + 1000 / 2;
+                                        guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].totalm * 1000 / 2) + 1000 / 2);
+                                        dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(suitableLines[betline].totalm * 1000 / 2) + 1000 / 2;
                                     }
                                     else
-                                        dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                        markAsLoose(currentRow);
                                 }
-                                else if (mres[i].score1 + mres[i].score2 < thisline[betline].total)
+                                else if (selectedResults[i].score1 + selectedResults[i].score2 < suitableLines[betline].total)
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = 1;
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
-                                    winbet = (winbet + Convert.ToInt32(thisline[betline].totalm * 1000));
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = Convert.ToInt32(thisline[betline].totalm * 1000);
+                                    markAsWin(currentRow, Convert.ToInt32(suitableLines[betline].totalm * 1000));
+                                    guyWinBet = (guyWinBet + Convert.ToInt32(suitableLines[betline].totalm * 1000));
                                 }
-                                else if (mres[i].score1 + mres[i].score2 == thisline[betline].total) // 2 vs 2
+                                else if (selectedResults[i].score1 + selectedResults[i].score2 == suitableLines[betline].total) // 2 vs 2
                                 {
-                                    dataGridView1.Rows[currentRow].Cells[7].Value = "P";
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Yellow;
-                                    dataGridView1.Rows[currentRow].Cells[8].Value = 1000;
-                                    winbet = winbet + 1000;
+                                    markAsReturn(currentRow);
+                                    guyWinBet = guyWinBet + 1000;
                                 }
                                 else
-                                    dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.OrangeRed;
+                                    markAsLoose(currentRow);
                                 currentRow++;
+                                break;
+                            case 404:
+                                log.Warn("Skiped coz tried to bet 404-bet");
                                 break;
                         }
                     }
                 }
-                labelbets.Visible = true;
-                labelwins.Visible = true;
-                labelroipers.Visible = true;
-                labelroi.Visible = true;
-                labelrake.Visible = true;
-                labelrakeavg.Visible = true;
-                labelbets.Text = "поставлено " + sumbet.ToString();
                 for (int i = dataGridView1.Rows.Count - 1; i >= 0; i--)
                 {
                     DataGridViewRow dr = dataGridView1.Rows[i];
-                    if (i >= currentRow)
+                    if (i > currentRow)
+                    {
                         dataGridView1.Rows.Remove(dr);
+                        log.Info("deleting rows (" + i + ")");
+                    }
                 }
-                labelwins.Text = "выйграно " + winbet.ToString();
-                double roi = (Convert.ToDouble(winbet) - Convert.ToDouble(sumbet)) / Convert.ToDouble(sumbet) * 100;
-                roiList.Add(roi);
-                labelroipers.Text = roi.ToString("0.000");
-                currentBetRows++;
+                
+                log.Info("guy # " + currentGuy + " placed " + guySumBet + " ,wins " + guyWinBet +  " and finished with roi = " + RoiResults(guyWinBet, guySumBet));
+                roiList.Add(RoiResults(guyWinBet,guySumBet));
+                sumbet += guySumBet;
+                winbet += guyWinBet;
+                currentGuy++;
             }
+            if (infoWindow.Visible)//refresh info window
+                ShowInfo();
             labelroipers.Text = roiList.Average().ToString("0.0");
             if (rakeList.Count != 0)
                 labelrakeavg.Text = rakeList.Average().ToString("0.000");
-
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -637,9 +643,117 @@ namespace bets
             checkedListBox1.SetItemChecked(0, true);
         }
 
-      
+        private void buttonInfo_Click(object sender, EventArgs e)
+        {
+            if (!infoWindow.Visible && sumbet > 0)
+            {
+                infoWindow.Visible = true;
+                ShowInfo();
+            }
+            else
+                infoWindow.Visible = false;
+        }
+
+        private void ShowInfo()
+        {
+            labelBets.Text = "поставлено " + sumbet.ToString();
+            labelwins.Text = "получено     " + winbet.ToString();
+            labelPlusovie.Text = "плюсовых " + roiList.Count(x => x > 0).ToString();
+            if (roiList.Count > 0)
+            {
+                labelBestRoi.Text = "лучший roi " + roiList.Max().ToString("0.0");
+                labelWorstRoi.Text = "худший roi " + roiList.Min().ToString("0.0");
+            }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            if (!tabControlDanilo.Visible)
+                tabControlDanilo.Visible = true;
+            else
+                tabControlDanilo.Visible = false;
+        }
+
+        private List<int> ReadAllowedBets()
+        {
+            List<int> allowed = new List<int>();
+            if (checkedListBox1.GetItemChecked(0))
+            {
+                allowed.Add(0);
+                allowed.Add(2);
+            }
+            if (checkedListBox1.GetItemChecked(1))
+            {
+                allowed.Add(3);
+                allowed.Add(4);
+            }
+            if (checkedListBox1.GetItemChecked(2))
+            {
+                allowed.Add(5);
+                allowed.Add(6);
+            }
+            if (!checkBoxNoDraw.Checked)
+            {
+                allowed.Add(1);
+            }
+            return allowed;
+        }
+
+        private void markAsWin(int row, int winnings)
+        {
+            dataGridView1.Rows[row].Cells[7].Value = 1;
+            dataGridView1.Rows[row].Cells[7].Style.BackColor = Color.LimeGreen;
+            dataGridView1.Rows[row].Cells[8].Value = winnings;
+        }
+        private void markAsReturn(int row)
+        {
+            dataGridView1.Rows[row].Cells[7].Value = "P";
+            dataGridView1.Rows[row].Cells[7].Style.BackColor = Color.Yellow;
+            dataGridView1.Rows[row].Cells[8].Value = 1000;
+        }
+        private void markAsLoose(int row)
+        {
+            dataGridView1.Rows[row].Cells[7].Style.BackColor = Color.OrangeRed;
+            dataGridView1.Rows[row].Cells[7].Value = 0;
+        }
+        private void fora2575(int currentRow, int foraWins, int foraReturn)
+        {
+            if (foraWins == 0 && foraReturn == 0)
+            {
+                dataGridView1.Rows[currentRow].Cells[7].Value = 0;
+                markAsLoose(currentRow);
+            }
+            if (foraWins == 1 && foraReturn == 1)
+            {
+
+                dataGridView1.Rows[currentRow].Cells[7].Value = "3/4";
+                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LightYellow;
+            }
+            if (foraWins == 2)
+            {
+
+                dataGridView1.Rows[currentRow].Cells[7].Value = 1;
+                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.LimeGreen;
+            }
+            if (foraWins == 0 && foraReturn == 1)
+            {
+                dataGridView1.Rows[currentRow].Cells[7].Value = "1/2";
+                dataGridView1.Rows[currentRow].Cells[7].Style.BackColor = Color.Orange;
+            }
+        }
+         private double RoiResults(int winbet, int sumbet)
+        {
+            double roi = (Convert.ToDouble(winbet) - Convert.ToDouble(sumbet)) / Convert.ToDouble(sumbet) * 100;
+            labelroipers.Visible = true;
+            labelroi.Visible = true;
+            labelrake.Visible = true;
+            labelrakeavg.Visible = true;
+            labelroipers.Text = roi.ToString("0.000");
+            return roi;
+        }
     }
 }
+
 
 
 
