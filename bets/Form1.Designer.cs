@@ -68,6 +68,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.checkBoxNoDraw = new System.Windows.Forms.CheckBox();
+            this.checkBoxFreshLine = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericHours)).BeginInit();
@@ -409,11 +410,11 @@
             // labelrake
             // 
             this.labelrake.AutoSize = true;
-            this.labelrake.Location = new System.Drawing.Point(197, 144);
+            this.labelrake.Location = new System.Drawing.Point(187, 147);
             this.labelrake.Name = "labelrake";
-            this.labelrake.Size = new System.Drawing.Size(49, 13);
+            this.labelrake.Size = new System.Drawing.Size(59, 13);
             this.labelrake.TabIndex = 26;
-            this.labelrake.Text = "avg rake";
+            this.labelrake.Text = "margin avg";
             this.labelrake.Visible = false;
             // 
             // checkBox1
@@ -476,18 +477,29 @@
             // checkBoxNoDraw
             // 
             this.checkBoxNoDraw.AutoSize = true;
-            this.checkBoxNoDraw.Location = new System.Drawing.Point(440, 81);
+            this.checkBoxNoDraw.Location = new System.Drawing.Point(440, 74);
             this.checkBoxNoDraw.Name = "checkBoxNoDraw";
             this.checkBoxNoDraw.Size = new System.Drawing.Size(81, 17);
             this.checkBoxNoDraw.TabIndex = 34;
             this.checkBoxNoDraw.Text = "без ничьих";
             this.checkBoxNoDraw.UseVisualStyleBackColor = true;
             // 
+            // checkBoxFreshLine
+            // 
+            this.checkBoxFreshLine.AutoSize = true;
+            this.checkBoxFreshLine.Location = new System.Drawing.Point(440, 90);
+            this.checkBoxFreshLine.Name = "checkBoxFreshLine";
+            this.checkBoxFreshLine.Size = new System.Drawing.Size(97, 17);
+            this.checkBoxFreshLine.TabIndex = 35;
+            this.checkBoxFreshLine.Text = "свежие линии";
+            this.checkBoxFreshLine.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(550, 644);
+            this.Controls.Add(this.checkBoxFreshLine);
             this.Controls.Add(this.checkBoxNoDraw);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.checkBox1);
@@ -572,6 +584,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.CheckBox checkBoxNoDraw;
+        private System.Windows.Forms.CheckBox checkBoxFreshLine;
     }
 }
 
