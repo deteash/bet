@@ -13,5 +13,6 @@ namespace bets
         public string team1;
         public string team2;
         public DateTime data;
+        public List<line> lines;
     }
 }

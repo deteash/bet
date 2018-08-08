@@ -60,32 +60,35 @@
             this.numericBetTimes = new System.Windows.Forms.NumericUpDown();
             this.labelrakeavg = new System.Windows.Forms.Label();
             this.labelrake = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.radioButtonDanilich = new System.Windows.Forms.RadioButton();
             this.radioButtonNaverochku = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButtonOrdinary = new System.Windows.Forms.RadioButton();
             this.checkBoxNoDraw = new System.Windows.Forms.CheckBox();
             this.checkBoxFreshLine = new System.Windows.Forms.CheckBox();
             this.buttonInfo = new System.Windows.Forms.Button();
             this.numericHoursFrom = new System.Windows.Forms.NumericUpDown();
             this.infoWindow = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.labelWorstRoi = new System.Windows.Forms.Label();
+            this.labelPlusovie = new System.Windows.Forms.Label();
+            this.labelBestRoi = new System.Windows.Forms.Label();
             this.labelwins = new System.Windows.Forms.Label();
             this.labelBets = new System.Windows.Forms.Label();
             this.tend = new System.Windows.Forms.TabPage();
             this.button2 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBoxCoeffMore = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.labelCoefDiff = new System.Windows.Forms.Label();
-            this.numericBetCoeffMore = new System.Windows.Forms.NumericUpDown();
             this.tabControlDanilo = new System.Windows.Forms.TabControl();
             this.label10 = new System.Windows.Forms.Label();
-            this.labelBestRoi = new System.Windows.Forms.Label();
-            this.labelPlusovie = new System.Windows.Forms.Label();
-            this.labelWorstRoi = new System.Windows.Forms.Label();
+            this.buttonGO = new System.Windows.Forms.Button();
+            this.buttonAutotest = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericHoursTo)).BeginInit();
@@ -96,17 +99,14 @@
             this.infoWindow.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericBetCoeffMore)).BeginInit();
             this.tabControlDanilo.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(29, 74);
+            this.button1.Location = new System.Drawing.Point(38, 6);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 35);
+            this.button1.Size = new System.Drawing.Size(78, 35);
             this.button1.TabIndex = 0;
             this.button1.Text = "заебашить пинакл";
             this.button1.UseVisualStyleBackColor = true;
@@ -137,7 +137,7 @@
             // labelroi
             // 
             this.labelroi.AutoSize = true;
-            this.labelroi.Location = new System.Drawing.Point(216, 145);
+            this.labelroi.Location = new System.Drawing.Point(198, 142);
             this.labelroi.Name = "labelroi";
             this.labelroi.Size = new System.Drawing.Size(18, 13);
             this.labelroi.TabIndex = 5;
@@ -148,7 +148,7 @@
             // 
             this.labelroipers.AutoSize = true;
             this.labelroipers.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelroipers.Location = new System.Drawing.Point(240, 137);
+            this.labelroipers.Location = new System.Drawing.Point(222, 134);
             this.labelroipers.Name = "labelroipers";
             this.labelroipers.Size = new System.Drawing.Size(36, 24);
             this.labelroipers.TabIndex = 6;
@@ -193,7 +193,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(29, 26);
+            this.label7.Location = new System.Drawing.Point(35, 44);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(81, 13);
             this.label7.TabIndex = 11;
@@ -211,7 +211,7 @@
             // 
             // buttonBet
             // 
-            this.buttonBet.Location = new System.Drawing.Point(172, 58);
+            this.buttonBet.Location = new System.Drawing.Point(187, 52);
             this.buttonBet.Name = "buttonBet";
             this.buttonBet.Size = new System.Drawing.Size(105, 55);
             this.buttonBet.TabIndex = 14;
@@ -318,9 +318,9 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(29, 120);
+            this.progressBar1.Location = new System.Drawing.Point(122, 23);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(101, 23);
+            this.progressBar1.Size = new System.Drawing.Size(245, 23);
             this.progressBar1.TabIndex = 16;
             this.progressBar1.Visible = false;
             // 
@@ -368,26 +368,26 @@
             this.numericHoursTo.Size = new System.Drawing.Size(31, 20);
             this.numericHoursTo.TabIndex = 22;
             this.numericHoursTo.Value = new decimal(new int[] {
-            6,
+            24,
             0,
             0,
             0});
             // 
             // numericReadLines
             // 
-            this.numericReadLines.Location = new System.Drawing.Point(29, 42);
+            this.numericReadLines.Location = new System.Drawing.Point(38, 64);
             this.numericReadLines.Maximum = new decimal(new int[] {
-            25000,
+            50000,
             0,
             0,
             0});
             this.numericReadLines.Name = "numericReadLines";
-            this.numericReadLines.Size = new System.Drawing.Size(101, 20);
+            this.numericReadLines.Size = new System.Drawing.Size(78, 20);
             this.numericReadLines.TabIndex = 23;
             // 
             // numericBetTimes
             // 
-            this.numericBetTimes.Location = new System.Drawing.Point(301, 73);
+            this.numericBetTimes.Location = new System.Drawing.Point(217, 113);
             this.numericBetTimes.Name = "numericBetTimes";
             this.numericBetTimes.Size = new System.Drawing.Size(40, 20);
             this.numericBetTimes.TabIndex = 24;
@@ -401,7 +401,7 @@
             // 
             this.labelrakeavg.AutoSize = true;
             this.labelrakeavg.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelrakeavg.Location = new System.Drawing.Point(263, 161);
+            this.labelrakeavg.Location = new System.Drawing.Point(245, 158);
             this.labelrakeavg.Name = "labelrakeavg";
             this.labelrakeavg.Size = new System.Drawing.Size(36, 24);
             this.labelrakeavg.TabIndex = 27;
@@ -411,32 +411,22 @@
             // labelrake
             // 
             this.labelrake.AutoSize = true;
-            this.labelrake.Location = new System.Drawing.Point(198, 169);
+            this.labelrake.Location = new System.Drawing.Point(180, 166);
             this.labelrake.Name = "labelrake";
             this.labelrake.Size = new System.Drawing.Size(59, 13);
             this.labelrake.TabIndex = 26;
             this.labelrake.Text = "margin avg";
             this.labelrake.Visible = false;
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(187, 2);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(126, 17);
-            this.checkBox1.TabIndex = 29;
-            this.checkBox1.Text = "нах странные форы";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // radioButtonDanilich
             // 
             this.radioButtonDanilich.AutoSize = true;
             this.radioButtonDanilich.Location = new System.Drawing.Point(6, 20);
             this.radioButtonDanilich.Name = "radioButtonDanilich";
-            this.radioButtonDanilich.Size = new System.Drawing.Size(103, 17);
+            this.radioButtonDanilich.Size = new System.Drawing.Size(98, 17);
             this.radioButtonDanilich.TabIndex = 31;
             this.radioButtonDanilich.TabStop = true;
-            this.radioButtonDanilich.Text = "Данилыч стайл";
+            this.radioButtonDanilich.Text = "Даныло стайл";
             this.radioButtonDanilich.UseVisualStyleBackColor = true;
             this.radioButtonDanilich.CheckedChanged += new System.EventHandler(this.radioButtonDanilich_CheckedChanged);
             // 
@@ -454,7 +444,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.radioButton1);
+            this.groupBox1.Controls.Add(this.radioButtonOrdinary);
             this.groupBox1.Controls.Add(this.radioButtonDanilich);
             this.groupBox1.Controls.Add(this.radioButtonNaverochku);
             this.groupBox1.Location = new System.Drawing.Point(375, 113);
@@ -464,16 +454,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "ракомод";
             // 
-            // radioButton1
+            // radioButtonOrdinary
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(6, 62);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(62, 17);
-            this.radioButton1.TabIndex = 33;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "обычно";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButtonOrdinary.AutoSize = true;
+            this.radioButtonOrdinary.Location = new System.Drawing.Point(6, 62);
+            this.radioButtonOrdinary.Name = "radioButtonOrdinary";
+            this.radioButtonOrdinary.Size = new System.Drawing.Size(62, 17);
+            this.radioButtonOrdinary.TabIndex = 33;
+            this.radioButtonOrdinary.TabStop = true;
+            this.radioButtonOrdinary.Text = "обычно";
+            this.radioButtonOrdinary.UseVisualStyleBackColor = true;
             // 
             // checkBoxNoDraw
             // 
@@ -516,20 +506,15 @@
             this.numericHoursFrom.Name = "numericHoursFrom";
             this.numericHoursFrom.Size = new System.Drawing.Size(33, 20);
             this.numericHoursFrom.TabIndex = 37;
-            this.numericHoursFrom.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // infoWindow
             // 
             this.infoWindow.Controls.Add(this.tabPage1);
             this.infoWindow.Controls.Add(this.tend);
-            this.infoWindow.Location = new System.Drawing.Point(25, 243);
+            this.infoWindow.Location = new System.Drawing.Point(-3, 227);
             this.infoWindow.Name = "infoWindow";
             this.infoWindow.SelectedIndex = 0;
-            this.infoWindow.Size = new System.Drawing.Size(199, 158);
+            this.infoWindow.Size = new System.Drawing.Size(184, 158);
             this.infoWindow.TabIndex = 38;
             // 
             // tabPage1
@@ -542,10 +527,37 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(191, 132);
+            this.tabPage1.Size = new System.Drawing.Size(176, 132);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Bets";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // labelWorstRoi
+            // 
+            this.labelWorstRoi.AutoSize = true;
+            this.labelWorstRoi.Location = new System.Drawing.Point(15, 80);
+            this.labelWorstRoi.Name = "labelWorstRoi";
+            this.labelWorstRoi.Size = new System.Drawing.Size(53, 13);
+            this.labelWorstRoi.TabIndex = 23;
+            this.labelWorstRoi.Text = "получено";
+            // 
+            // labelPlusovie
+            // 
+            this.labelPlusovie.AutoSize = true;
+            this.labelPlusovie.Location = new System.Drawing.Point(15, 49);
+            this.labelPlusovie.Name = "labelPlusovie";
+            this.labelPlusovie.Size = new System.Drawing.Size(53, 13);
+            this.labelPlusovie.TabIndex = 22;
+            this.labelPlusovie.Text = "получено";
+            // 
+            // labelBestRoi
+            // 
+            this.labelBestRoi.AutoSize = true;
+            this.labelBestRoi.Location = new System.Drawing.Point(15, 65);
+            this.labelBestRoi.Name = "labelBestRoi";
+            this.labelBestRoi.Size = new System.Drawing.Size(53, 13);
+            this.labelBestRoi.TabIndex = 21;
+            this.labelBestRoi.Text = "получено";
             // 
             // labelwins
             // 
@@ -570,7 +582,7 @@
             this.tend.Location = new System.Drawing.Point(4, 22);
             this.tend.Name = "tend";
             this.tend.Padding = new System.Windows.Forms.Padding(3);
-            this.tend.Size = new System.Drawing.Size(197, 143);
+            this.tend.Size = new System.Drawing.Size(176, 132);
             this.tend.TabIndex = 1;
             this.tend.Text = "Trend";
             this.tend.UseVisualStyleBackColor = true;
@@ -587,42 +599,41 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.numericUpDown3);
-            this.tabPage2.Controls.Add(this.numericUpDown2);
+            this.tabPage2.Controls.Add(this.textBox3);
+            this.tabPage2.Controls.Add(this.textBox2);
+            this.tabPage2.Controls.Add(this.textBoxCoeffMore);
             this.tabPage2.Controls.Add(this.label4);
             this.tabPage2.Controls.Add(this.labelCoefDiff);
-            this.tabPage2.Controls.Add(this.numericBetCoeffMore);
+            this.tabPage2.ImeMode = System.Windows.Forms.ImeMode.On;
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(180, 132);
+            this.tabPage2.Size = new System.Drawing.Size(156, 132);
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Настрой Ебашителя";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // numericUpDown3
+            // textBox3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(112, 49);
-            this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown3.TabIndex = 44;
-            this.numericUpDown3.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
+            this.textBox3.Location = new System.Drawing.Point(112, 48);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(40, 20);
+            this.textBox3.TabIndex = 47;
             // 
-            // numericUpDown2
+            // textBox2
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(10, 49);
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown2.TabIndex = 43;
-            this.numericUpDown2.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
+            this.textBox2.Location = new System.Drawing.Point(11, 48);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(40, 20);
+            this.textBox2.TabIndex = 46;
+            // 
+            // textBoxCoeffMore
+            // 
+            this.textBoxCoeffMore.Location = new System.Drawing.Point(112, 22);
+            this.textBoxCoeffMore.Name = "textBoxCoeffMore";
+            this.textBoxCoeffMore.Size = new System.Drawing.Size(40, 20);
+            this.textBoxCoeffMore.TabIndex = 45;
+            this.textBoxCoeffMore.Text = "3";
             // 
             // label4
             // 
@@ -642,69 +653,73 @@
             this.labelCoefDiff.TabIndex = 41;
             this.labelCoefDiff.Text = "ставим если кф > ";
             // 
-            // numericBetCoeffMore
-            // 
-            this.numericBetCoeffMore.Location = new System.Drawing.Point(112, 22);
-            this.numericBetCoeffMore.Name = "numericBetCoeffMore";
-            this.numericBetCoeffMore.Size = new System.Drawing.Size(40, 20);
-            this.numericBetCoeffMore.TabIndex = 0;
-            this.numericBetCoeffMore.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            // 
             // tabControlDanilo
             // 
             this.tabControlDanilo.Controls.Add(this.tabPage2);
-            this.tabControlDanilo.Location = new System.Drawing.Point(244, 243);
+            this.tabControlDanilo.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.tabControlDanilo.Location = new System.Drawing.Point(373, 227);
             this.tabControlDanilo.Name = "tabControlDanilo";
             this.tabControlDanilo.SelectedIndex = 0;
-            this.tabControlDanilo.Size = new System.Drawing.Size(188, 158);
+            this.tabControlDanilo.Size = new System.Drawing.Size(164, 158);
             this.tabControlDanilo.TabIndex = 40;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(283, 75);
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label10.Location = new System.Drawing.Point(198, 113);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(12, 13);
+            this.label10.Size = new System.Drawing.Size(14, 16);
             this.label10.TabIndex = 41;
             this.label10.Text = "x";
-            this.label10.Visible = false;
             // 
-            // labelBestRoi
+            // buttonGO
             // 
-            this.labelBestRoi.AutoSize = true;
-            this.labelBestRoi.Location = new System.Drawing.Point(15, 65);
-            this.labelBestRoi.Name = "labelBestRoi";
-            this.labelBestRoi.Size = new System.Drawing.Size(53, 13);
-            this.labelBestRoi.TabIndex = 21;
-            this.labelBestRoi.Text = "получено";
+            this.buttonGO.Location = new System.Drawing.Point(38, 90);
+            this.buttonGO.Name = "buttonGO";
+            this.buttonGO.Size = new System.Drawing.Size(78, 25);
+            this.buttonGO.TabIndex = 42;
+            this.buttonGO.Text = "GO";
+            this.buttonGO.UseVisualStyleBackColor = true;
+            this.buttonGO.Click += new System.EventHandler(this.button3_Click);
             // 
-            // labelPlusovie
+            // buttonAutotest
             // 
-            this.labelPlusovie.AutoSize = true;
-            this.labelPlusovie.Location = new System.Drawing.Point(15, 49);
-            this.labelPlusovie.Name = "labelPlusovie";
-            this.labelPlusovie.Size = new System.Drawing.Size(53, 13);
-            this.labelPlusovie.TabIndex = 22;
-            this.labelPlusovie.Text = "получено";
+            this.buttonAutotest.Location = new System.Drawing.Point(38, 121);
+            this.buttonAutotest.Name = "buttonAutotest";
+            this.buttonAutotest.Size = new System.Drawing.Size(77, 24);
+            this.buttonAutotest.TabIndex = 43;
+            this.buttonAutotest.Text = "autotest";
+            this.buttonAutotest.UseVisualStyleBackColor = true;
+            this.buttonAutotest.Click += new System.EventHandler(this.button4_Click);
             // 
-            // labelWorstRoi
+            // button5
             // 
-            this.labelWorstRoi.AutoSize = true;
-            this.labelWorstRoi.Location = new System.Drawing.Point(15, 80);
-            this.labelWorstRoi.Name = "labelWorstRoi";
-            this.labelWorstRoi.Size = new System.Drawing.Size(53, 13);
-            this.labelWorstRoi.TabIndex = 23;
-            this.labelWorstRoi.Text = "получено";
+            this.button5.Location = new System.Drawing.Point(287, 176);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(67, 23);
+            this.button5.TabIndex = 44;
+            this.button5.Text = "add marks";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(355, 178);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(20, 20);
+            this.textBox1.TabIndex = 48;
+            this.textBox1.Text = "10";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(550, 644);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.buttonAutotest);
+            this.Controls.Add(this.buttonGO);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.tabControlDanilo);
             this.Controls.Add(this.button2);
@@ -714,7 +729,6 @@
             this.Controls.Add(this.checkBoxFreshLine);
             this.Controls.Add(this.checkBoxNoDraw);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.labelrakeavg);
             this.Controls.Add(this.labelrake);
             this.Controls.Add(this.numericBetTimes);
@@ -754,9 +768,6 @@
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericBetCoeffMore)).EndInit();
             this.tabControlDanilo.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -796,11 +807,10 @@
         private System.Windows.Forms.NumericUpDown numericBetTimes;
         private System.Windows.Forms.Label labelrakeavg;
         private System.Windows.Forms.Label labelrake;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.RadioButton radioButtonDanilich;
         private System.Windows.Forms.RadioButton radioButtonNaverochku;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButtonOrdinary;
         private System.Windows.Forms.CheckBox checkBoxNoDraw;
         private System.Windows.Forms.CheckBox checkBoxFreshLine;
         private System.Windows.Forms.Button buttonInfo;
@@ -813,15 +823,19 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabControl tabControlDanilo;
-        private System.Windows.Forms.NumericUpDown numericUpDown3;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label labelCoefDiff;
-        private System.Windows.Forms.NumericUpDown numericBetCoeffMore;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label labelWorstRoi;
         private System.Windows.Forms.Label labelPlusovie;
         private System.Windows.Forms.Label labelBestRoi;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox textBoxCoeffMore;
+        private System.Windows.Forms.Button buttonGO;
+        private System.Windows.Forms.Button buttonAutotest;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
