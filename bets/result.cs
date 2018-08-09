@@ -14,5 +14,10 @@ namespace bets
         public string team2;
         public DateTime data;
         public List<line> lines;
+        public result()
+        {
+            lines = new List<line>();
+        }
     }
+   
 }

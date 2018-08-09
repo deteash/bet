@@ -21,7 +21,6 @@ namespace bets
         private List<result> results;
         List<double> roiList;
         Random rand;
-        int linesCount;
         private int sumbet = 0;
         private int winbet = 0;
         Microsoft.Office.Interop.Excel.Application ObjExcel;
@@ -45,7 +44,7 @@ namespace bets
             testParametrs = new List<TestParametrs>();
             currentTestParametrs = new TestParametrs();
             roiList = new List<double>();
-            Random rand = new Random();
+            rand = new Random();
             this.ShowInTaskbar = true;
             log.Info("Form INIT");
         }
@@ -60,14 +59,13 @@ namespace bets
             log.Info("Reading xls");
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                results = new List<result>();
                 ObjExcel = new Microsoft.Office.Interop.Excel.Application();
                 ObjWorkBook = ObjExcel.Workbooks.Open(openFileDialog1.FileName, 0, true, 5, "", "", false, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "", true, false, 0, true, false, false);
                 ObjWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)ObjWorkBook.Sheets[1];
             }
         }
 
-            public void ReadXml()
+        public void ReadXml()
         { 
             if (ObjWorkSheet == null)
             {
@@ -77,6 +75,9 @@ namespace bets
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
             int read = (int)numericReadLines.Value;
+            results = new List<result>();
+            int linesCount = 0;
+            bool skipLines = false;
             progressBar1.Visible = true;
             progressBar1.Maximum = read;
             string pattern1 = "yyyy-MM-dd HH:mm";
@@ -95,16 +96,22 @@ namespace bets
                     {
                         if (j == 1 && x.Contains(':'))//read data and score
                         {
+                            DateTime data = new DateTime();
                             if (DateTime.TryParseExact(ParseDate.CutScore(x), pattern1, System.Globalization.CultureInfo.InvariantCulture,
-                                                System.Globalization.DateTimeStyles.None, out res.data))
+                                                System.Globalization.DateTimeStyles.None, out data))
                             {
-                                res.score1 = ParseDate.ParseScore1(x);
-                                res.score2 = ParseDate.ParseScore2(x);
-                                res = new result();
-                               // newRes = true;
+                                res = new result
+                                {
+                                    data = data,
+                                    score1 = ParseDate.ParseScore1(x),
+                                    score2 = ParseDate.ParseScore2(x)
+                                };
+                                if (skipLines) 
+                                    skipLines = false;
                             }
                             else
                             {
+                                skipLines = true;
                                 log.Warn("Bad result detected on line " + i);
                             }
                         }
@@ -113,7 +120,7 @@ namespace bets
                             if (!x.Contains("Corners"))
                             {
                                 ln.team1 = x;
-                                if (res.team1.Equals(string.Empty))
+                                if (res.team1 == null)
                                     res.team1 = x;
                             }
                             else
@@ -130,7 +137,7 @@ namespace bets
                         else if (j == 3 && x != string.Empty && x != "Команда 2" && !x.Contains("Corners"))
                         {
                             ln.team2 = x;
-                            if (res.team2.Equals(string.Empty))
+                            if (res.team2 == null)
                             {
                                 res.team2 = x;
                                 results.Add(res);
@@ -156,7 +163,7 @@ namespace bets
                         else if (j == 12 && x != string.Empty && x != "Мен")
                         { ln.totalm = Convert.ToDouble(x); }
 
-                        else if (j == 13 && x.Contains(':'))//read scan
+                        else if (j == 13 && x.Contains(':') && !skipLines)//read scan
                         {
                             if (!DateTime.TryParseExact(x, pattern2, System.Globalization.CultureInfo.InvariantCulture,
                                                 System.Globalization.DateTimeStyles.None, out ln.data))
@@ -178,6 +185,7 @@ namespace bets
             progressBar1.Visible = false;
             label8.Visible = true;
             stopwatch.Stop();
+            ObjWorkSheet = null;
             ObjWorkBook.Close();
             ObjExcel.Quit();
             label3.Visible = true;
@@ -191,6 +199,8 @@ namespace bets
             {
                 i++;
                 x = ObjWorkSheet.Cells[i, 2].Text;
+                if (i > (int)numericReadLines.Value)
+                    return (int)numericReadLines.Value;
             }
             return i;
         }
@@ -218,7 +228,6 @@ namespace bets
             int hoursTo = currentTestParametrs.hoursTo;
             int hoursFrom = currentTestParametrs.hoursFrom;
             dataGridView1.Rows.Clear();
-            dataGridView1.RowCount = nbets;
             roiList.Clear();
             int currentGuy = 0;
             sumbet = 0;
@@ -233,13 +242,13 @@ namespace bets
                 log.Info("guy # " + currentGuy + " starts bets");
                 int guyWinBet = 0;
                 int guySumBet = 0;
+                dataGridView1.RowCount = nbets;
                 if (results == null || nbets > results.Count())
                 {
                     MessageBox.Show("Не найдено столько событий!");
                     log.Warn("bets>events");
                     return;
                 }
-                //List<result> selectedResults = new List<result>();
                 List<int> betEventIndexes = new List<int>();
                 while (betEventIndexes.Count() < nbets)
                 {
@@ -681,6 +690,8 @@ namespace bets
                 ShowInfo();
             labelroipers.Text = roiList.Average().ToString("0.0");
             log.Info("beting finished with roi = " + roiList.Average().ToString("0.0"));
+            rakeList.Clear();
+            allowedBetsList.Clear();
             if (rakeList.Count != 0)
                 labelrakeavg.Text = rakeList.Average().ToString("0.000");
             if(autoMode)
@@ -848,6 +859,8 @@ namespace bets
             {
                 i++;
                 x = ObjWorkSheet.Cells[i, 2].Text;
+                if (i > (int)numericReadLines.Value)
+                    return (int)numericReadLines.Value;
             }
             return i;
         }
@@ -857,11 +870,13 @@ namespace bets
             ReadXml();
         }
 
-        private void button4_Click(object sender, EventArgs e)// button autotest
+        private void button4_Click(object sender, EventArgs e)// button full autotest
         {
             SelectXls();
             ReadXml();
             log.Info("###############################starting autotest###################################################");
+            if (testParametrs.Count == 0)
+                SaveTestParametrs();
             foreach (TestParametrs param in testParametrs)
             {
                 currentTestParametrs = param;
@@ -896,7 +911,26 @@ namespace bets
                 hoursTo = (int)numericHoursTo.Value
             };
             currentTestParametrs = tmp;
+            for (int i=0; i < Convert.ToInt32(textBoxMarksnumb.Text); i++)
             testParametrs.Add(tmp);
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            if (testParametrs.Count == 0)
+                SaveTestParametrs();
+            foreach (TestParametrs param in testParametrs)
+            {
+                currentTestParametrs = param;
+                File.AppendAllText(@"file.txt", JsonConvert.SerializeObject(currentTestParametrs) + Environment.NewLine);
+                PlaceBets(true);
+                log.Info("###############################changing parametrs, continue autotest###################################################");
+            }
+        }
+
+        private void buttonclearMarks_Click(object sender, EventArgs e)
+        {
+            testParametrs.Clear();
         }
     }
 }

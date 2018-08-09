@@ -88,7 +88,9 @@
             this.buttonGO = new System.Windows.Forms.Button();
             this.buttonAutotest = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxMarksnumb = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.buttonclearMarks = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericBets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericHoursTo)).BeginInit();
@@ -175,7 +177,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.label5.Location = new System.Drawing.Point(48, 169);
+            this.label5.Location = new System.Drawing.Point(35, 175);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(59, 13);
             this.label5.TabIndex = 9;
@@ -184,7 +186,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(48, 182);
+            this.label6.Location = new System.Drawing.Point(35, 190);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(46, 13);
             this.label6.TabIndex = 10;
@@ -193,7 +195,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(35, 44);
+            this.label7.Location = new System.Drawing.Point(35, 43);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(81, 13);
             this.label7.TabIndex = 11;
@@ -202,7 +204,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(53, 154);
+            this.label8.Location = new System.Drawing.Point(53, 162);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(41, 13);
             this.label8.TabIndex = 13;
@@ -375,7 +377,7 @@
             // 
             // numericReadLines
             // 
-            this.numericReadLines.Location = new System.Drawing.Point(38, 64);
+            this.numericReadLines.Location = new System.Drawing.Point(38, 59);
             this.numericReadLines.Maximum = new decimal(new int[] {
             50000,
             0,
@@ -675,7 +677,7 @@
             // 
             // buttonGO
             // 
-            this.buttonGO.Location = new System.Drawing.Point(38, 90);
+            this.buttonGO.Location = new System.Drawing.Point(38, 82);
             this.buttonGO.Name = "buttonGO";
             this.buttonGO.Size = new System.Drawing.Size(78, 25);
             this.buttonGO.TabIndex = 42;
@@ -685,17 +687,17 @@
             // 
             // buttonAutotest
             // 
-            this.buttonAutotest.Location = new System.Drawing.Point(38, 121);
+            this.buttonAutotest.Location = new System.Drawing.Point(38, 109);
             this.buttonAutotest.Name = "buttonAutotest";
             this.buttonAutotest.Size = new System.Drawing.Size(77, 24);
             this.buttonAutotest.TabIndex = 43;
-            this.buttonAutotest.Text = "autotest";
+            this.buttonAutotest.Text = "full autotest";
             this.buttonAutotest.UseVisualStyleBackColor = true;
             this.buttonAutotest.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(287, 176);
+            this.button5.Location = new System.Drawing.Point(287, 180);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(67, 23);
             this.button5.TabIndex = 44;
@@ -703,20 +705,42 @@
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
-            // textBox1
+            // textBoxMarksnumb
             // 
-            this.textBox1.Location = new System.Drawing.Point(355, 178);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(20, 20);
-            this.textBox1.TabIndex = 48;
-            this.textBox1.Text = "10";
+            this.textBoxMarksnumb.Location = new System.Drawing.Point(355, 182);
+            this.textBoxMarksnumb.Name = "textBoxMarksnumb";
+            this.textBoxMarksnumb.Size = new System.Drawing.Size(20, 20);
+            this.textBoxMarksnumb.TabIndex = 48;
+            this.textBoxMarksnumb.Text = "10";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(38, 136);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(77, 25);
+            this.button3.TabIndex = 49;
+            this.button3.Text = "autotest";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
+            // buttonclearMarks
+            // 
+            this.buttonclearMarks.Location = new System.Drawing.Point(287, 158);
+            this.buttonclearMarks.Name = "buttonclearMarks";
+            this.buttonclearMarks.Size = new System.Drawing.Size(88, 23);
+            this.buttonclearMarks.TabIndex = 50;
+            this.buttonclearMarks.Text = "clear marks";
+            this.buttonclearMarks.UseVisualStyleBackColor = true;
+            this.buttonclearMarks.Click += new System.EventHandler(this.buttonclearMarks_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(550, 644);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.buttonclearMarks);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.textBoxMarksnumb);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.buttonAutotest);
             this.Controls.Add(this.buttonGO);
@@ -835,7 +859,9 @@
         private System.Windows.Forms.Button buttonGO;
         private System.Windows.Forms.Button buttonAutotest;
         private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxMarksnumb;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button buttonclearMarks;
     }
 }
 
